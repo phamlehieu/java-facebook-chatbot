@@ -34,6 +34,7 @@ public class WebHookController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(WebHookController.class);
 
 	/**
+	 * Use for setup facebook webhook
 	 * 
 	 * @param request
 	 *            HttpServletRequest
@@ -41,35 +42,41 @@ public class WebHookController {
 	 *            verify token (You provide this token to facebook)
 	 * @param challenge
 	 *            challenge string
-	 * @return challenge string if verify successful, otherwise response with HTTP status 403
+	 * @return challenge string if verify successful, otherwise response with
+	 *         HTTP status 403
 	 */
 	@RequestMapping(value = "/webhook", method = RequestMethod.GET)
-	public ResponseEntity<String> webhookValidation(HttpServletRequest request,
+	public ResponseEntity<String> webhookVerify(HttpServletRequest request,
 			@RequestParam(name = "hub.verify_token") String token,
 			@RequestParam(name = "hub.challenge") String challenge) {
-		LOGGER.info("Request URL: " + request.getRequestURI());
-		LOGGER.info("Query Params: " + request.getQueryString());
+		LOGGER.info("Receive verify request");
 
 		if (VALIDATION_TOKEN.equals(token)) {
+			LOGGER.info("Verify successful. Send back hub.challenge ");
 			return new ResponseEntity<String>(challenge, HttpStatus.OK);
 		} else {
+			LOGGER.error("Wrong validation token");
 			return new ResponseEntity<String>("Error, wrong validation token", HttpStatus.FORBIDDEN);
 		}
 	}
 
 	/**
+	 * Controller to handler webhook callback, parse the content of request to
+	 * messaging object and pass to another service to process
 	 * 
 	 * @param request
+	 *            HttpServletRequest
 	 * @param body
-	 * @return
+	 *            content of POST request
+	 * @return send back a 200
 	 */
 	@RequestMapping(value = "/webhook", method = RequestMethod.POST)
 	public ResponseEntity<String> webhookMessage(HttpServletRequest request, @RequestBody String body) {
-		LOGGER.info("Request URL: " + request.getRequestURI());
-		LOGGER.info("Query Params: " + request.getQueryString());
 		LOGGER.info("Request body: " + body);
+		
 		JSONObject object = new JSONObject(body);
 		JSONArray entryArray = object.getJSONArray("entry");
+		
 		for (int i = 0; i < entryArray.length(); i++) {
 			JSONObject entryItem = entryArray.getJSONObject(i);
 			JSONArray messagingArray = entryItem.getJSONArray("messaging");
@@ -78,6 +85,7 @@ public class WebHookController {
 				messageProcessingService.process(messagingItem);
 			}
 		}
+		
 		return new ResponseEntity<String>("", HttpStatus.OK);
 	}
 }
