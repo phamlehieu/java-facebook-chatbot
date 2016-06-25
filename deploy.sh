@@ -6,7 +6,7 @@ echo "pulling latest version of the code"
 ssh $DEPLOY_USER@$DEPLOY_HOST 'docker pull hieupham/java-fb-chat'
 
 echo "starting the new version"
-ssh $DEPLOY_USER@$DEPLOY_HOST 'docker run --name chatbot --rm -i -p 8080:8080 hieupham/java-fb-chat'
+ssh $DEPLOY_USER@$DEPLOY_HOST 'docker run --name chatbot --rm -p 8080:8080 hieupham/java-fb-chat'
 
 echo "success!"
 
