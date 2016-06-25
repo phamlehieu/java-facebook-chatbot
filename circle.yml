@@ -20,4 +20,4 @@ deployment:
     - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
     - docker build -t hieupham/java-fb-chat .
     - docker push hieupham/java-fb-chat
-    - ./deploy.sh
+    - sh ./deploy.sh
