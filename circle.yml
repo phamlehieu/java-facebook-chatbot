@@ -2,17 +2,17 @@ machine:
   java:
     version: oraclejdk8
   service: 
-  		- docker
+  	- docker
 dependencies:
 	override: 
-    	- mvn dependency:go-offline
+    - mvn dependency:go-offline
 test:
 	override:
-    	- mvn integration-test
+    - mvn integration-test
 deployment
 	dev:
 		branch: master
 		commands: 
-			- docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-			- docker build -t hieupham/java-fb-chat .
-			- docker push hieupham/java-fb-chat
+		- docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+		- docker build -t hieupham/java-fb-chat .
+		- docker push hieupham/java-fb-chat
