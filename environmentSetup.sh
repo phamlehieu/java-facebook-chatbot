@@ -5,4 +5,5 @@ function copyEnvVarsToApplicationProperties {
     sed -i 's/^validation.token=.*/validation.token=$VALIDATION_TOKEN/g' $APPLICATION_PROPERTIES
     sed -i 's/^app.secret=.*/app.secret=$APP_SECRET/g' $APPLICATION_PROPERTIES
     sed -i 's/^page.access.token=.*/age.access.token=$PAGE_ACCESS_TOKEN/g' $APPLICATION_PROPERTIES
+    cat $APPLICATION_PROPERTIES
 }
