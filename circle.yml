@@ -4,6 +4,8 @@ machine:
   services:
     - docker
 dependencies:
+  pre:
+    - source environmentSetup.sh && copyEnvVarsToApplicationProperties
   override:
     - mvn dependency:go-offline
 test:
