@@ -1,5 +1,5 @@
 function copyEnvVarsToApplicationProperties {
-    APPLICATION_PROPERTIES=$HOME"/src/main/resources/application.properties"
+    APPLICATION_PROPERTIES=$HOME"/java-facebook-chatbot/src/main/resources/application.properties"
     export APPLICATION_PROPERTIES
     echo "Application Properties should exist at $APPLICATION_PROPERTIES"
     sed 's/^validation.token=.*/validation.token=$VALIDATION_TOKEN/g' $APPLICATION_PROPERTIES
