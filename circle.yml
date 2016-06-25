@@ -4,10 +4,10 @@ machine:
   services:
     - docker
 dependencies:
-	override:
+  override:
     - mvn dependency:go-offline
 test:
-	override:
+  override:
     - mvn integration-test
 deployment
 	dev:
