@@ -1,10 +1,10 @@
 machine:
   java:
     version: oraclejdk8
-  service: 
-  	- docker
+  services:
+    - docker
 dependencies:
-	override: 
+	override:
     - mvn dependency:go-offline
 test:
 	override:
