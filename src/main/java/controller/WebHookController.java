@@ -72,6 +72,8 @@ public class WebHookController {
 	 */
 	@RequestMapping(value = "/webhook", method = RequestMethod.POST)
 	public ResponseEntity<String> webhookMessage(HttpServletRequest request, @RequestBody String body) {
+		LOGGER.info("Receive request from facebook");
+		LOGGER.info("Signature: " + request.getHeader("x-hub-signature"));
 		LOGGER.info("Request body: " + body);
 		
 		JSONObject object = new JSONObject(body);
