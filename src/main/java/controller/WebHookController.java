@@ -1,5 +1,11 @@
 package controller;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Formatter;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 
 import org.json.JSONArray;
@@ -27,6 +33,9 @@ import service.MessageProcessingService;
 public class WebHookController {
 	@Value("${validation.token}")
 	public String VALIDATION_TOKEN;
+	
+	@Value("${app.secret}")
+	public String APP_SECRET;
 
 	@Autowired
 	public MessageProcessingService messageProcessingService;
@@ -49,8 +58,8 @@ public class WebHookController {
 	public ResponseEntity<String> webhookVerify(HttpServletRequest request,
 			@RequestParam(name = "hub.verify_token") String token,
 			@RequestParam(name = "hub.challenge") String challenge) {
-		LOGGER.info("Receive verify request");
-
+		LOGGER.info("Receive GET request to /webhook");
+		
 		if (VALIDATION_TOKEN.equals(token)) {
 			LOGGER.info("Verify successful. Send back hub.challenge ");
 			return new ResponseEntity<String>(challenge, HttpStatus.OK);
@@ -72,9 +81,19 @@ public class WebHookController {
 	 */
 	@RequestMapping(value = "/webhook", method = RequestMethod.POST)
 	public ResponseEntity<String> webhookMessage(HttpServletRequest request, @RequestBody String body) {
-		LOGGER.info("Receive request from facebook");
-		LOGGER.info("Signature: " + request.getHeader("x-hub-signature"));
+		LOGGER.info("Receive POST request to webhook");
 		LOGGER.info("Request body: " + body);
+		if (request.getHeader("x-hub-signature") != null) {
+			String signature = request.getHeader("x-hub-signature").split("=")[1];
+			if (!verifyRequestSignature(signature, APP_SECRET, body, "HmacSHA1")) {
+				LOGGER.info("Verify request signature failed");
+				return new ResponseEntity<String>("",HttpStatus.UNAUTHORIZED);
+			}
+		} else {
+			LOGGER.info("Missing x-hub-signature in request header");
+			return new ResponseEntity<String>("",HttpStatus.BAD_REQUEST);
+		}
+
 		
 		JSONObject object = new JSONObject(body);
 		JSONArray entryArray = object.getJSONArray("entry");
@@ -89,5 +108,31 @@ public class WebHookController {
 		}
 		
 		return new ResponseEntity<String>("", HttpStatus.OK);
+	}
+	
+	private boolean verifyRequestSignature(String signature, String secrect, String data, String algorithm) {
+		SecretKeySpec key = new SecretKeySpec(secrect.getBytes(),algorithm);
+		try {
+			Mac mac = Mac.getInstance(algorithm);
+			mac.init(key);
+			
+			byte[] result = mac.doFinal(data.getBytes());
+			Formatter formatter = new Formatter();
+			for (byte b : result) {
+				formatter.format("%02x", b);
+			}
+
+			String expectSignature = formatter.toString();
+			formatter.close();
+			if (signature.equals(expectSignature)) {
+				return true;
+			}
+		} catch (NoSuchAlgorithmException e) {
+			LOGGER.info("Invalid agorithm " + e.getMessage());
+			e.printStackTrace();
+		} catch (InvalidKeyException e) {
+			LOGGER.info("Invalid key " + e.getMessage());
+		}
+		return false;
 	}
 }
