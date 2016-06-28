@@ -2,10 +2,6 @@ package controller;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Formatter;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 
 import org.json.JSONArray;
@@ -24,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import service.MessageProcessingService;
-import service.utils.CryptoUtils;
+import service.utils.CryptoHelper;
 
 /**
  * Handle request from facebook
@@ -40,6 +36,9 @@ public class WebHookController {
 
 	@Autowired
 	private MessageProcessingService messageProcessingService;
+	
+	@Autowired
+	private CryptoHelper cryptoHelper;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WebHookController.class);
 
@@ -113,7 +112,7 @@ public class WebHookController {
 	
 	private boolean verifyRequestSignature(String signature, String secret, String data, String algorithm) {
 		try {
-			String expectSignature = CryptoUtils.createHMAC(secret, data, algorithm);
+			String expectSignature = cryptoHelper.createHMAC(secret, data, algorithm);
 			if (signature.equals(expectSignature)) {
 				return true;
 			}

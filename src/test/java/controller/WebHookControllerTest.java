@@ -1,6 +1,7 @@
 package controller;
 
 import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -26,7 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import service.MessageProcessingService;
-import service.utils.CryptoUtils;
+import service.utils.CryptoHelper;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
@@ -40,6 +41,9 @@ public class WebHookControllerTest {
 	
 	@Mock
 	private MessageProcessingService messageProcessingServiceMock;
+	
+	@Mock
+	private CryptoHelper cryptoHelperMock;
 	
 	@InjectMocks
 	private WebHookController webHookController = new WebHookController();
@@ -76,17 +80,18 @@ public class WebHookControllerTest {
 	
 	@Test
 	public void testWebHookMessage() throws Exception {
+		String signature ="d99d5c0cc063c2e804765e69220f928e0f9e54ce";
+		
 		doNothing().when(messageProcessingServiceMock).process(isA(JSONObject.class));
+		when(cryptoHelperMock.createHMAC(isA(String.class), isA(String.class), isA(String.class))).thenReturn("d99d5c0cc063c2e804765e69220f928e0f9e54ce");
 		
 		InputStream is = this.getClass().getResourceAsStream("/json/webhookMessage_sha1_1.json");
 		Scanner sc = new Scanner(is,"UTF-8");
 		String json = sc.useDelimiter("\\Z").next();
 		sc.close();
 		
-		String signature = "sha1=".concat(CryptoUtils.createHMAC(TEST_APP_SECRET, json, "HmacSHA1"));
-		
 		mockMvc.perform(post("/webhook")
-				.header("x-hub-signature", signature)
+				.header("x-hub-signature", "sha1=".concat(signature))
 				.contentType("application/json")
 				.content(json))
 		.andExpect(status().is(200))

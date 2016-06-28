@@ -7,12 +7,15 @@ import java.util.Formatter;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.springframework.stereotype.Component;
+
 /**
  * 
  * @author HieuPham
  *
  */
-public class CryptoUtils {
+@Component
+public class CryptoHelper {
 	
 	/**
 	 * 
@@ -23,7 +26,7 @@ public class CryptoUtils {
 	 * @throws NoSuchAlgorithmException
 	 * @throws InvalidKeyException
 	 */
-	public static String createHMAC(String secret, String data, String algorithm) throws NoSuchAlgorithmException, InvalidKeyException {
+	public String createHMAC(String secret, String data, String algorithm) throws NoSuchAlgorithmException, InvalidKeyException {
 		SecretKeySpec key = new SecretKeySpec(secret.getBytes(),algorithm);
 		
 		Mac mac = Mac.getInstance(algorithm);
