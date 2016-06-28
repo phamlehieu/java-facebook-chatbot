@@ -78,7 +78,7 @@ public class WebHookControllerTest {
 	public void testWebHookMessage() throws Exception {
 		doNothing().when(messageProcessingServiceMock).process(isA(JSONObject.class));
 		
-		InputStream is = this.getClass().getResourceAsStream("json/webhookMessage_sha1_1.json");
+		InputStream is = this.getClass().getResourceAsStream("/json/webhookMessage_sha1_1.json");
 		Scanner sc = new Scanner(is,"UTF-8");
 		String json = sc.useDelimiter("\\Z").next();
 		sc.close();
