@@ -66,7 +66,7 @@ public class WebHookController {
 			return new ResponseEntity<String>(challenge, HttpStatus.OK);
 		} else {
 			LOGGER.error("Wrong validation token");
-			return new ResponseEntity<String>("Error, wrong validation token", HttpStatus.FORBIDDEN);
+			return new ResponseEntity<String>("Wrong validation token", HttpStatus.FORBIDDEN);
 		}
 	}
 
