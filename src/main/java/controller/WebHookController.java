@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import service.MessageProcessingService;
+import service.utils.CryptoUtils;
 
 /**
  * Handle request from facebook
@@ -32,13 +33,13 @@ import service.MessageProcessingService;
 @ComponentScan(basePackages = "service")
 public class WebHookController {
 	@Value("${validation.token}")
-	public String VALIDATION_TOKEN;
+	private String VALIDATION_TOKEN;
 	
 	@Value("${app.secret}")
-	public String APP_SECRET;
+	private String APP_SECRET;
 
 	@Autowired
-	public MessageProcessingService messageProcessingService;
+	private MessageProcessingService messageProcessingService;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WebHookController.class);
 
@@ -110,28 +111,17 @@ public class WebHookController {
 		return new ResponseEntity<String>("", HttpStatus.OK);
 	}
 	
-	private boolean verifyRequestSignature(String signature, String secrect, String data, String algorithm) {
-		SecretKeySpec key = new SecretKeySpec(secrect.getBytes(),algorithm);
+	private boolean verifyRequestSignature(String signature, String secret, String data, String algorithm) {
 		try {
-			Mac mac = Mac.getInstance(algorithm);
-			mac.init(key);
-			
-			byte[] result = mac.doFinal(data.getBytes());
-			Formatter formatter = new Formatter();
-			for (byte b : result) {
-				formatter.format("%02x", b);
-			}
-
-			String expectSignature = formatter.toString();
-			formatter.close();
+			String expectSignature = CryptoUtils.createHMAC(secret, data, algorithm);
 			if (signature.equals(expectSignature)) {
 				return true;
 			}
 		} catch (NoSuchAlgorithmException e) {
-			LOGGER.info("Invalid agorithm " + e.getMessage());
+			LOGGER.error("Invalid agorithm " + e.getMessage());
 			e.printStackTrace();
 		} catch (InvalidKeyException e) {
-			LOGGER.info("Invalid key " + e.getMessage());
+			LOGGER.error("Invalid key " + e.getMessage());
 		}
 		return false;
 	}

@@ -27,10 +27,10 @@ import model.Summary;
 @Service
 public class MessageProcessingService {
 	@Autowired
-	public SendMessageService sendMessageService;
+	private SendMessageService sendMessageService;
 
 	@Autowired
-	public MessageBuilder messageBuilder;
+	private MessageBuilder messageBuilder;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MessageProcessingService.class);
 
@@ -59,7 +59,7 @@ public class MessageProcessingService {
 	 * @param object
 	 *            JSON data of message
 	 */
-	public void onAuthentication(JSONObject object) {
+	private void onAuthentication(JSONObject object) {
 		LOGGER.info("Handle authentication");
 		// TODO Authentication
 	}
@@ -71,7 +71,7 @@ public class MessageProcessingService {
 	 * @param object
 	 *            JSON data of message
 	 */
-	public void onDelivery(JSONObject object) {
+	private void onDelivery(JSONObject object) {
 		LOGGER.info("Handle delivery confirmation event");
 		// TODO Delivery confirmation
 	}
@@ -83,7 +83,7 @@ public class MessageProcessingService {
 	 * @param object
 	 *            JSON data of message
 	 */
-	public void onPostback(JSONObject object) {
+	private void onPostback(JSONObject object) {
 		LOGGER.info("Handle postback event");
 		// TODO handle postback
 	}
@@ -95,7 +95,7 @@ public class MessageProcessingService {
 	 * @param object
 	 *            JSON data of message
 	 */
-	public void onMessage(JSONObject object) {
+	private void onMessage(JSONObject object) {
 		LOGGER.info("Handle message event");
 
 		// Get the sender id to send message back
