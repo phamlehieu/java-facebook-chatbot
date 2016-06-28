@@ -13,6 +13,9 @@ dependencies:
 test:
   override:
     - mvn integration-test
+    post:
+    - mkdir -p $CIRCLE_TEST_REPORTS/report/
+    - cp -R ./target/site/jacoco/* $CIRCLE_ARTIFACTS/report/
 deployment:
   dev:
     branch: master
