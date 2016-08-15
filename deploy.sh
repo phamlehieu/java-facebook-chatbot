@@ -1,4 +1,5 @@
 echo "stopping running application"
+ssh $DEPLOY_USER@$DEPLOY_HOST 'docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS'
 ssh $DEPLOY_USER@$DEPLOY_HOST 'docker stop chatbot'
 ssh $DEPLOY_USER@$DEPLOY_HOST 'docker rm chatbot'
 
